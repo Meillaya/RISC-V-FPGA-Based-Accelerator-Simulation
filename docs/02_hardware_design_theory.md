@@ -9,7 +9,7 @@ Matrix multiplication is a prime example. This fundamental operation is at the c
 - **Computer Graphics:** Transforming 3D models, applying textures, and rendering scenes all involve extensive matrix operations.
 - **Scientific Computing:** Solving systems of linear equations, simulating fluid dynamics, and analyzing quantum systems often boil down to large-scale matrix computations.
 
-A naive software implementation of multiplying two \(n \times n\) matrices has a time complexity of \(O(n^3)\). While more advanced algorithms exist, the computational cost remains significant for large matrices. Executing this on a CPU involves a continuous cycle of fetching instructions, fetching data from memory, performing a calculation, and writing the result back to memory. This memory-access pattern, often called the "von Neumann bottleneck," consumes significant time and energy, limiting the achievable performance.
+A naive software implementation of multiplying two $n \times n$ matrices has a time complexity of $O(n^3)$. While more advanced algorithms exist, the computational cost remains significant for large matrices. Executing this on a CPU involves a continuous cycle of fetching instructions, fetching data from memory, performing a calculation, and writing the result back to memory. This memory-access pattern, often called the "von Neumann bottleneck," consumes significant time and energy, limiting the achievable performance.
 
 This leads to a central hypothesis: **For a specific, computationally-bound task like matrix multiplication, we can achieve significant performance gains and power efficiency by designing a custom hardware circuit that is explicitly structured to solve that one problem.**
 
@@ -23,14 +23,15 @@ Understanding the theoretical foundations of matrix multiplication is crucial fo
 
 ### 1.5.1. Classical Complexity Analysis
 
-The naive approach to multiplying two \(n \times n\) matrices requires \(n^3\) scalar multiplications and \(n^2(n-1)\) additions, leading to the well-known \(O(n^3)\) time complexity. However, this bound is not tight, and numerous algorithms have been developed to reduce this complexity.
+The naive approach to multiplying two $n \times n$ matrices requires $n^3$ scalar multiplications and $n^2(n-1)$ additions, leading to the well-known $O(n^3)$ time complexity. However, this bound is not tight, and numerous algorithms have been developed to reduce this complexity.
 
-**Strassen's Algorithm** (1969) was the first to break the cubic barrier, achieving \(O(n^{\log_2 7}) \approx O(n^{2.807})\) complexity through a divide-and-conquer approach that reduces the number of recursive multiplications from 8 to 7. The algorithm decomposes each \(n \times n\) matrix multiplication into seven smaller multiplications of \((n/2) \times (n/2)\) matrices, plus several additions and subtractions:
+**Strassen's Algorithm** (1969) was the first to break the cubic barrier, achieving $O(n^{\log_2 7}) \approx O(n^{2.807})$ complexity through a divide-and-conquer approach that reduces the number of recursive multiplications from 8 to 7. The algorithm decomposes each $n \times n$ matrix multiplication into seven smaller multiplications of $(n/2) \times (n/2)$ matrices, plus several additions and subtractions:
 
-For matrices \(A\) and \(B\) partitioned as:
-\[ A = \begin{pmatrix} A_{11} & A_{12} \\ A_{21} & A_{22} \end{pmatrix}, \quad B = \begin{pmatrix} B_{11} & B_{12} \\ B_{21} & B_{22} \end{pmatrix} \]
+For matrices $A$ and $B$ partitioned as:
+$$A = \begin{pmatrix} A_{11} & A_{12} \\ A_{21} & A_{22} \end{pmatrix}, \quad B = \begin{pmatrix} B_{11} & B_{12} \\ B_{21} & B_{22} \end{pmatrix}$$
 
 Strassen's algorithm computes seven intermediate matrices:
+$$
 \begin{align}
 M_1 &= (A_{11} + A_{22})(B_{11} + B_{22}) \\
 M_2 &= (A_{21} + A_{22})B_{11} \\
@@ -40,33 +41,35 @@ M_5 &= (A_{11} + A_{12})B_{22} \\
 M_6 &= (A_{21} - A_{11})(B_{11} + B_{12}) \\
 M_7 &= (A_{12} - A_{22})(B_{21} + B_{22})
 \end{align}
-
+$$
 And then constructs the result:
+$$
 \begin{align}
 C_{11} &= M_1 + M_4 - M_5 + M_7 \\
 C_{12} &= M_3 + M_5 \\
 C_{21} &= M_2 + M_4 \\
 C_{22} &= M_1 - M_2 + M_3 + M_6
 \end{align}
+$$
 
-Recent theoretical advances have pushed the complexity bound even lower. The current best-known upper bound is approximately \(O(n^{2.373})\) achieved by Le Gall (2014), building upon decades of work including the Coppersmith-Winograd algorithm.
+Recent theoretical advances have pushed the complexity bound even lower. The current best-known upper bound is approximately $O(n^{2.373})$ achieved by Le Gall (2014), building upon decades of work including the Coppersmith-Winograd algorithm.
 
 ### 1.5.2. Hardware Implementation Complexity
 
 While theoretical complexity bounds provide important insights, hardware implementation introduces additional considerations including:
 
-**Memory Access Complexity**: The von Neumann bottleneck becomes particularly pronounced for large matrices. For an \(n \times n\) matrix multiplication, the naive algorithm requires \(O(n^2)\) memory reads and writes, but the memory access pattern can significantly impact cache performance.
+**Memory Access Complexity**: The von Neumann bottleneck becomes particularly pronounced for large matrices. For an $n \times n$ matrix multiplication, the naive algorithm requires $O(n^2)$ memory reads and writes, but the memory access pattern can significantly impact cache performance.
 
-**Arithmetic Intensity**: Defined as the ratio of arithmetic operations to memory operations, matrix multiplication has an arithmetic intensity of \(O(n)\) for the naive algorithm. This means that for large matrices, computation dominates memory access, making the problem amenable to parallel acceleration.
+**Arithmetic Intensity**: Defined as the ratio of arithmetic operations to memory operations, matrix multiplication has an arithmetic intensity of $O(n)$ for the naive algorithm. This means that for large matrices, computation dominates memory access, making the problem amenable to parallel acceleration.
 
-**Data Reuse Patterns**: Each element of matrix \(A\) is used \(P\) times (where \(P\) is the number of columns in matrix \(B\)), and each element of matrix \(B\) is used \(M\) times (where \(M\) is the number of rows in matrix \(A\)). Exploiting this data reuse is crucial for efficient hardware implementation.
+**Data Reuse Patterns**: Each element of matrix $A$ is used $P$ times (where $P$ is the number of columns in matrix $B$), and each element of matrix $B$ is used $M$ times (where $M$ is the number of rows in matrix $A$). Exploiting this data reuse is crucial for efficient hardware implementation.
 
 ### 1.5.3. Systolic Array Theory
 
 Systolic arrays, introduced by Kung and Leiserson (1978), provide a theoretical framework for designing regular, parallel architectures for matrix computations. The key insight is to map the data dependencies of matrix multiplication onto a regular grid of processing elements (PEs), where data flows in a pipelined manner.
 
-For matrix multiplication \(C = A \times B\), the systolic array processes the computation as:
-\[ C_{ij} = \sum_{k=0}^{N-1} A_{ik} \cdot B_{kj} \]
+For matrix multiplication $C = A \times B$, the systolic array processes the computation as:
+$$C_{ij} = \sum_{k=0}^{N-1} A_{ik} \cdot B_{kj}$$
 
 The theoretical advantages of systolic arrays include:
 - **Regularity**: All PEs are identical and perform the same operations
@@ -74,7 +77,7 @@ The theoretical advantages of systolic arrays include:
 - **Pipelining**: Data flows through the array in a wave-like pattern
 - **Scalability**: Arrays can be extended to arbitrary sizes
 
-**Computational Efficiency**: An \(r \times s\) systolic array can compute an \(r \times s\) matrix multiplication in \(O(n)\) time steps, compared to \(O(n^3)\) for sequential algorithms, achieving a speedup of \(O(n^2)\) with \(O(n^2)\) processing elements.
+**Computational Efficiency**: An $r \times s$ systolic array can compute an $r \times s$ matrix multiplication in $O(n)$ time steps, compared to $O(n^3)$ for sequential algorithms, achieving a speedup of $O(n^2)$ with $O(n^2)$ processing elements.
 
 ### 1.5.4. Sparse Matrix Considerations
 
@@ -90,57 +93,57 @@ The theoretical challenge lies in maintaining load balance and achieving high ut
 
 ### 2.1. The Mathematics of Matrix Multiplication
 
-Before designing the hardware, we must first understand the mathematical operation we aim to accelerate. Given two matrices, \(A\) of dimensions \(M \times N\) and \(B\) of dimensions \(N \times P\), their product, \(C = A \times B\), will be a matrix of dimensions \(M \times P\).
+Before designing the hardware, we must first understand the mathematical operation we aim to accelerate. Given two matrices, $A$ of dimensions $M \times N$ and $B$ of dimensions $N \times P$, their product, $C = A \times B$, will be a matrix of dimensions $M \times P$.
 
-Each element \(C_{ij}\) in the resulting matrix is calculated as the dot product of the \(i\)-th row of matrix \(A\) and the \(j\)-th column of matrix \(B\).
+Each element $C_{ij}$ in the resulting matrix is calculated as the dot product of the $i$-th row of matrix $A$ and the $j$-th column of matrix $B$.
 
-\[ C_{ij} = \sum_{k=0}^{N-1} A_{ik} \cdot B_{kj} \]
+$$C_{ij} = \sum_{k=0}^{N-1} A_{ik} \cdot B_{kj}$$
 
-For example, for \(C_{00}\), the calculation would be:
-\[ C_{00} = A_{00}B_{00} + A_{01}B_{10} + A_{02}B_{20} + \dots + A_{0(N-1)}B_{(N-1)0} \]
+For example, for $C_{00}$, the calculation would be:
+$$C_{00} = A_{00}B_{00} + A_{01}B_{10} + A_{02}B_{20} + \dots + A_{0(N-1)}B_{(N-1)0}$$
 
 This calculation involves a series of multiplications followed by accumulations (additions). This "Multiply-Accumulate" or **MAC** operation is the fundamental computational unit of our design.
 
 ### 2.1.1. Mathematical Foundations and Numerical Considerations
 
-**Precision and Overflow Analysis**: In hardware implementations, numerical precision becomes a critical design parameter. For fixed-point arithmetic with \(w\)-bit operands, the product of two numbers requires \(2w\) bits to avoid overflow. When accumulating \(N\) such products, the accumulator must accommodate:
+**Precision and Overflow Analysis**: In hardware implementations, numerical precision becomes a critical design parameter. For fixed-point arithmetic with $w$-bit operands, the product of two numbers requires $2w$ bits to avoid overflow. When accumulating $N$ such products, the accumulator must accommodate:
 
-\[ \text{Accumulator width} = 2w + \lceil \log_2(N) \rceil \]
+$$\text{Accumulator width} = 2w + \lceil \log_2(N) \rceil$$
 
-**Rounding and Quantization**: Hardware implementations often employ quantization strategies to reduce resource usage. The quantization error \(\epsilon_q\) for rounding to \(b\) bits follows:
+**Rounding and Quantization**: Hardware implementations often employ quantization strategies to reduce resource usage. The quantization error $\epsilon_q$ for rounding to $b$ bits follows:
 
-\[ \epsilon_q \leq \frac{1}{2} \cdot 2^{-b} \]
+$$\epsilon_q \leq \frac{1}{2} \cdot 2^{-b}$$
 
-For matrix multiplication, the accumulated error grows as \(\sqrt{N} \cdot \epsilon_q\), requiring careful analysis of the precision-accuracy trade-offs.
+For matrix multiplication, the accumulated error grows as $\sqrt{N} \cdot \epsilon_q$, requiring careful analysis of the precision-accuracy trade-offs.
 
-**Condition Number Analysis**: The numerical stability of matrix multiplication depends on the condition number \(\kappa(A)\) of the input matrices:
+**Condition Number Analysis**: The numerical stability of matrix multiplication depends on the condition number $\kappa(A)$ of the input matrices:
 
-\[ \kappa(A) = \|A\| \cdot \|A^{-1}\| \]
+$$\kappa(A) = \|A\| \cdot \|A^{-1}\|$$
 
-For well-conditioned matrices (\(\kappa(A) \approx 1\)), reduced precision implementations maintain accuracy. For ill-conditioned matrices (\(\kappa(A) \gg 1\)), higher precision may be required.
+For well-conditioned matrices ($\kappa(A) \approx 1$), reduced precision implementations maintain accuracy. For ill-conditioned matrices ($\kappa(A) \gg 1$), higher precision may be required.
 
 ### 2.1.2. Performance Modeling and Analysis
 
-**Theoretical Peak Performance**: For a systolic array with \(P\) processing elements operating at frequency \(f\), the theoretical peak performance is:
+**Theoretical Peak Performance**: For a systolic array with $P$ processing elements operating at frequency $f$, the theoretical peak performance is:
 
-\[ \text{Peak FLOPS} = P \times f \times 2 \]
+$$\text{Peak FLOPS} = P \times f \times 2$$
 
 The factor of 2 accounts for one multiplication and one addition per MAC operation.
 
-**Memory Bandwidth Requirements**: The bandwidth required for sustaining peak performance depends on the data reuse factor. For block-based matrix multiplication with block size \(B \times B\), the arithmetic intensity is:
+**Memory Bandwidth Requirements**: The bandwidth required for sustaining peak performance depends on the data reuse factor. For block-based matrix multiplication with block size $B \times B$, the arithmetic intensity is:
 
-\[ \text{Arithmetic Intensity} = \frac{2B^3}{3B^2} = \frac{2B}{3} \]
+$$\text{Arithmetic Intensity} = \frac{2B^3}{3B^2} = \frac{2B}{3}$$
 
 This indicates that larger block sizes improve arithmetic intensity, reducing memory bandwidth pressure.
 
 **Roofline Model Analysis**: The achievable performance is bounded by either computational capacity or memory bandwidth according to the roofline model:
 
-\[ \text{Achievable Performance} = \min(\text{Peak FLOPS}, \text{Bandwidth} \times \text{Arithmetic Intensity}) \]
+$$\text{Achievable Performance} = \min(\text{Peak FLOPS}, \text{Bandwidth} \times \text{Arithmetic Intensity})$$
 
 **Efficiency Metrics**: Hardware efficiency is measured using several metrics:
-- **Resource Efficiency**: \(\eta_R = \frac{\text{Utilized Resources}}{\text{Total Resources}}\)
-- **Power Efficiency**: \(\eta_P = \frac{\text{FLOPS}}{\text{Power Consumption}}\) (FLOPS/Watt)
-- **Area Efficiency**: \(\eta_A = \frac{\text{FLOPS}}{\text{Silicon Area}}\) (FLOPS/mm²)
+- **Resource Efficiency**: $\eta_R = \frac{\text{Utilized Resources}}{\text{Total Resources}}$
+- **Power Efficiency**: $\eta_P = \frac{\text{FLOPS}}{\text{Power Consumption}}$ (FLOPS/Watt)
+- **Area Efficiency**: $\eta_A = \frac{\text{FLOPS}}{\text{Silicon Area}}$ (FLOPS/mm²)
 
 ### 2.2. The Architectural Blueprint
 
@@ -158,8 +161,8 @@ Our architecture consists of three main components:
 ### 2.3. Memory Access Strategy
 
 A key optimization lies in how we store and access the matrices.
--   **Matrix A** will be stored in **row-major order**. This means the elements of the first row are stored contiguously, followed by the second row, and so on. To calculate \(C_{ij}\), we need the \(i\)-th row of A.
--   **Matrix B** will be stored in **column-major order**. Here, the elements of the first column are stored contiguously. This is a crucial design choice. To calculate \(C_{ij}\), we need the \(j\)-th column of B. By storing it in column-major order, we can read the required elements sequentially, just as we do for matrix A. If we stored B in row-major order, we would have to perform complex, non-sequential address calculations to fetch the column elements, which would be much less efficient.
+-   **Matrix A** will be stored in **row-major order**. This means the elements of the first row are stored contiguously, followed by the second row, and so on. To calculate $C_{ij}$, we need the $i$-th row of A.
+-   **Matrix B** will be stored in **column-major order**. Here, the elements of the first column are stored contiguously. This is a crucial design choice. To calculate $C_{ij}$, we need the $j$-th column of B. By storing it in column-major order, we can read the required elements sequentially, just as we do for matrix A. If we stored B in row-major order, we would have to perform complex, non-sequential address calculations to fetch the column elements, which would be much less efficient.
 -   **Matrix C** will be stored in **row-major order**, as is conventional.
 
 This memory layout ensures that for any dot product calculation, the required elements from both A and B can be streamed into the PE using simple, incrementing address counters.
@@ -589,31 +592,31 @@ endmodule
 
 For large matrices that exceed on-chip memory capacity, **tiled matrix multiplication** becomes essential. This technique divides large matrices into smaller blocks (tiles) that fit within the available BRAM resources:
 
-Given matrices \(A_{M \times N}\) and \(B_{N \times P}\), we can partition them into tiles of size \(T_M \times T_N\) and \(T_N \times T_P\) respectively. The computation becomes:
+Given matrices $A_{M \times N}$ and $B_{N \times P}$, we can partition them into tiles of size $T_M \times T_N$ and $T_N \times T_P$ respectively. The computation becomes:
 
-\[ C_{ij}^{(tile)} = \sum_{k=0}^{\lceil N/T_N \rceil - 1} A_{ik}^{(tile)} \times B_{kj}^{(tile)} \]
+$$C_{ij}^{(tile)} = \sum_{k=0}^{\lceil N/T_N \rceil - 1} A_{ik}^{(tile)} \times B_{kj}^{(tile)}$$
 
 **Memory Management Strategy**: Tiled implementations require sophisticated memory management:
 - **Double Buffering**: While one tile is being computed, the next tiles are loaded from external memory
 - **Data Prefetching**: Anticipatory loading of tiles to hide memory latency
 - **Tile Size Optimization**: Balancing on-chip memory usage with arithmetic intensity
 
-**Performance Implications**: The optimal tile size \(T_{opt}\) maximizes the ratio of computation to communication:
+**Performance Implications**: The optimal tile size $T_{opt}$ maximizes the ratio of computation to communication:
 
-\[ T_{opt} = \arg\max_T \frac{2T^3}{3T^2 + \text{overhead}} \]
+$$T_{opt} = \arg\max_T \frac{2T^3}{3T^2 + \text{overhead}}$$
 
 ### 7.2. Multi-Level Systolic Arrays
 
-Extending our single-PE design to a full systolic array enables massive parallelization. A \(P \times Q\) systolic array can compute multiple output elements simultaneously:
+Extending our single-PE design to a full systolic array enables massive parallelization. A $P \times Q$ systolic array can compute multiple output elements simultaneously:
 
 **Data Flow Patterns**:
 - **Weight Stationary**: Matrix weights remain in PEs while input data flows through
 - **Output Stationary**: Partial results accumulate in PEs while inputs stream through  
 - **Input Stationary**: Input activations remain stationary while weights flow
 
-**Scalability Analysis**: For an \(R \times S\) systolic array computing \(M \times N\) by \(N \times P\) matrices:
-- **Utilization Efficiency**: \(\eta = \frac{\min(M,R) \times \min(P,S)}{R \times S}\)
-- **Throughput**: One complete matrix multiplication every \(\max(M,N,P)\) cycles after initial pipeline fill
+**Scalability Analysis**: For an $R \times S$ systolic array computing $M \times N$ by $N \times P$ matrices:
+- **Utilization Efficiency**: $\eta = \frac{\min(M,R) \times \min(P,S)}{R \times S}$
+- **Throughput**: One complete matrix multiplication every $\max(M,N,P)$ cycles after initial pipeline fill
 
 ### 7.3. High-Precision Arithmetic Support
 
@@ -624,7 +627,7 @@ Modern applications often require extended precision arithmetic. **128-bit float
 - 128-bit multiplier: ~800 DSP blocks (requires resource optimization)
 
 **Optimization Strategies**:
-- **Karatsuba Multiplication**: Reduces complexity from \(O(n^2)\) to \(O(n^{\log_2 3})\)
+- **Karatsuba Multiplication**: Reduces complexity from $O(n^2)$ to $O(n^{\log_2 3})$
 - **Pipeline Depth Adjustment**: Deeper pipelines maintain throughput with complex arithmetic
 - **Mixed-Precision Computing**: Use high precision only where numerically required
 
@@ -705,9 +708,9 @@ This comprehensive exploration of FPGA-based matrix multiplication acceleration 
 
 The project successfully demonstrates several critical principles:
 
-**Theoretical Foundation**: The deep mathematical analysis reveals that matrix multiplication's \(O(n^3)\) computational complexity, combined with its high arithmetic intensity and data reuse patterns, makes it an ideal candidate for hardware acceleration. The progression from classical algorithms to modern approaches like Strassen's method shows how theoretical advances can be translated into practical hardware optimizations.
+**Theoretical Foundation**: The deep mathematical analysis reveals that matrix multiplication's $O(n^3)$ computational complexity, combined with its high arithmetic intensity and data reuse patterns, makes it an ideal candidate for hardware acceleration. The progression from classical algorithms to modern approaches like Strassen's method shows how theoretical advances can be translated into practical hardware optimizations.
 
-**Architectural Innovation**: The systolic array architecture, rooted in Kung and Leiserson's foundational work, provides a template for highly parallel, efficient computation. Our single-PE implementation serves as a proof-of-concept that can be extended to full systolic arrays, potentially achieving speedups of \(O(n^2)\) over sequential implementations.
+**Architectural Innovation**: The systolic array architecture, rooted in Kung and Leiserson's foundational work, provides a template for highly parallel, efficient computation. Our single-PE implementation serves as a proof-of-concept that can be extended to full systolic arrays, potentially achieving speedups of $O(n^2)$ over sequential implementations.
 
 **Implementation Excellence**: The Verilog implementation showcases the critical importance of timing in hardware design. The debugging journey, from write-address race conditions to memory read latency issues, illustrates that hardware design requires a fundamentally different mindset from software development—one where timing, not just logic, determines correctness.
 
