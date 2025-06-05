@@ -1,0 +1,3 @@
+.spectstory/
+.cursorindexingignore
+*.o
