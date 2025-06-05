@@ -28,4 +28,11 @@ SECTIONS
     . += 4096; /* 4k stack */
     _stack_top = .;
   } > ram
+
+  . = ALIGN(0x1000);
+  .tohost : {
+    tohost = .;
+    . += 64;
+    fromhost = .;
+  } > ram
 } 

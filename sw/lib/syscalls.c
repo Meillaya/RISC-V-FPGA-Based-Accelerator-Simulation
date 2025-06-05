@@ -1,19 +1,27 @@
 #include <stddef.h>
 
-// A simple implementation of puts for bare-metal RISC-V
-// This writes to the Spike default UART address.
-#define UART_BASE 0x10000000
+// A simple implementation of puts for bare-metal RISC-V using HTIF.
+
+// These symbols are defined in the linker script.
+extern volatile long tohost;
+extern volatile long fromhost;
 
 int puts(const char *s) {
-    volatile char *uart = (char *)UART_BASE;
     int count = 0;
-
+    
+    // Simple HTIF console output
     while (*s) {
-        *uart = *s++;
+        // Write character to console (device 1, command 1)
+        tohost = 0x0101000000000000UL | (unsigned char)*s;
+        while (tohost != 0);
+        s++;
         count++;
     }
-    *uart = '\n';
+    
+    // Write newline
+    tohost = 0x0101000000000000UL | '\n';
+    while (tohost != 0);
     count++;
-
+    
     return count;
 } 
