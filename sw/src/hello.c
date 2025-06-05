@@ -1,6 +1,8 @@
-#include <stdio.h>
+// We are not using the standard library, so we don't include stdio.h
+// Instead, we provide a forward declaration of our own puts function.
+int puts(const char *s);
 
 int main() {
-    printf("Hello, RISC-V!\n");
+    puts("Hello, RISC-V!");
     return 0;
 } 

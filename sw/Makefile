@@ -5,11 +5,13 @@ RISCV_PREFIX ?= /opt/riscv64-gnu-toolchain-elf-bin/bin/riscv64-unknown-elf-
 CC = $(RISCV_PREFIX)gcc
 LD = $(RISCV_PREFIX)ld
 
-SRCS_C = src/hello.c lib/syscalls.c
-SRCS_S = src/crt0.s
-OBJS = $(patsubst src/%.c, build/%.o, $(SRCS_C)) $(patsubst src/%.s, build/%.o, $(SRCS_S))
+VPATH = src:lib
 
-CFLAGS = -march=rv64gc -mabi=lp64d -O2 -g -mcmodel=medany
+SRCS_C = hello.c syscalls.c
+SRCS_S = crt0.s
+OBJS = $(addprefix build/, $(SRCS_C:.c=.o)) $(addprefix build/, $(SRCS_S:.s=.o))
+
+CFLAGS = -march=rv64gc -mabi=lp64d -O2 -g -mcmodel=medany -Isrc -Ilib
 LDFLAGS = -T src/link.ld -nostdlib -nostartfiles
 
 SIMULATOR ?= spike
@@ -21,15 +23,11 @@ all: build/$(TARGET)
 build/$(TARGET): $(OBJS)
 	$(CC) $(LDFLAGS) -o $@ $^
 
-build/%.o: src/%.c
+build/%.o: %.c
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-build/%.o: lib/%.c
-	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) -c -o $@ $<
-
-build/%.o: src/%.s
+build/%.o: %.s
 	@mkdir -p $(@D)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
