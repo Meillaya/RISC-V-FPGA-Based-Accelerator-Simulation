@@ -1,3 +1,328 @@
+# RISC-V FPGA-Based Accelerator Simulation - .gitignore
+
+# ===== PROJECT-SPECIFIC =====
 .specstory/
 .cursorindexingignore
+
+# ===== BUILD ARTIFACTS =====
+# General build directories
+build/
+bin/
+obj/
+out/
+dist/
+
+# Compiled object files
 *.o
+*.obj
+*.elf
+*.exe
+*.dll
+*.so
+*.dylib
+*.a
+*.lib
+
+# ===== RISC-V TOOLCHAIN OUTPUTS =====
+# Cross-compiled binaries
+*.bin
+*.hex
+*.ihex
+*.srec
+*.mem
+*.mif
+
+# Assembly listings and map files
+*.lst
+*.map
+*.nm
+*.objdump
+*.readelf
+
+# Debug files
+*.debug
+*.dwarf
+*.gdb_history
+
+# Linker outputs
+*.ld.tmp
+
+# ===== VERILOG & HARDWARE SIMULATION =====
+# Simulation waveforms (can be large files)
+*.vcd
+*.fsdb
+*.vpd
+*.wlf
+*.ghw
+
+# Compiled Verilog/SystemVerilog
+*.vvp
+*.vpi
+*.so
+
+# Icarus Verilog outputs
+iverilog.log
+iverilog.cmd
+
+# ModelSim/QuestaSim
+work/
+transcript
+vsim.wlf
+*.vstf
+*.wlf
+modelsim.ini
+
+# Vivado/Xilinx
+*.jou
+*.log
+*.str
+*.xpr
+*.cache/
+*.hw/
+*.ip_user_files/
+*.runs/
+*.sim/
+*.srcs/
+*.gen/
+
+# Altera/Intel Quartus
+*.qpf
+*.qsf
+*.qws
+*.rpt
+*.summary
+*.pin
+*.pof
+*.sof
+db/
+incremental_db/
+output_files/
+
+# Synopsys
+*.syn
+*.mr
+*.pvl
+*.svf
+*.simv
+*.daidir/
+csrc/
+ucli.key
+
+# ===== SOFTWARE DEVELOPMENT =====
+# C/C++ artifacts
+*.i
+*.ii
+*.s
+*.su
+*.idb
+*.pdb
+*.ilk
+
+# Core dumps
+core
+core.*
+vgcore.*
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+!hw/Makefile
+!sw/Makefile
+!tools/Makefile
+
+# Autotools
+configure
+config.log
+config.status
+autom4te.cache/
+
+# ===== SPIKE SIMULATOR =====
+# Spike outputs
+spike.log
+*.spike
+
+# ===== PYTHON BUILD ARTIFACTS =====
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+*.pyd
+
+# Python environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# ===== DOCUMENTATION =====
+# Generated documentation
+*.pdf
+*.dvi
+*.aux
+*.toc
+*.log
+*.out
+*.synctex.gz
+*.fdb_latexmk
+*.fls
+*.nav
+*.snm
+*.vrb
+
+# Doxygen
+html/
+latex/
+Doxygen.log
+
+# ===== EDITOR & IDE FILES =====
+# Vim
+*.swp
+*.swo
+*.tmp
+*~
+.vimrc.local
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+*.elc
+auto-save-list
+tramp
+.\#*
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Eclipse
+.project
+.cproject
+.metadata/
+.settings/
+
+# CLion
+.idea/
+cmake-build-*/
+
+# ===== OS-SPECIFIC FILES =====
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ===== LOGS & TEMPORARY FILES =====
+# Log files
+*.log
+*.out
+*.err
+test_results.log
+simulation.log
+
+# Temporary files
+*.tmp
+*.temp
+*.bak
+*.backup
+*.orig
+*.rej
+
+# Lock files
+*.lock
+.lock
+
+# ===== ARCHIVES & PACKAGES =====
+*.7z
+*.dmg
+*.gz
+*.iso
+*.jar
+*.rar
+*.tar
+*.zip
+*.bz2
+*.xz
+
+# ===== PERFORMANCE & PROFILING =====
+# Profiling data
+*.prof
+*.gcov
+*.gcda
+*.gcno
+gmon.out
+callgrind.out.*
+massif.out.*
+cachegrind.out.*
+
+# ===== SECURITY & KEYS =====
+# SSH keys
+id_rsa
+id_dsa
+id_ecdsa
+id_ed25519
+*.pem
+*.key
+*.crt
+*.p12
+
+# Environment variables with secrets
+.env.local
+.env.*.local
+secrets.txt
+
+# ===== CUSTOM PROJECT FILES =====
+# Large test files (optional - comment out if needed)
+# *.large
+# test_vectors_large/
+
+# Backup ROM files (keep originals, ignore backups)
+*_backup.v
+*_original.v
+rom_memory_old.v
+
+# Experiment directories
+experiments/
+scratch/
+temp_*

@@ -6,21 +6,25 @@
 extern volatile long tohost;
 extern volatile long fromhost;
 
+int putchar(int c) {
+    // Write character to console (device 1, command 1)
+    tohost = 0x0101000000000000UL | (unsigned char)c;
+    while (tohost != 0);
+    return c;
+}
+
 int puts(const char *s) {
     int count = 0;
     
     // Simple HTIF console output
     while (*s) {
-        // Write character to console (device 1, command 1)
-        tohost = 0x0101000000000000UL | (unsigned char)*s;
-        while (tohost != 0);
+        putchar(*s);
         s++;
         count++;
     }
     
     // Write newline
-    tohost = 0x0101000000000000UL | '\n';
-    while (tohost != 0);
+    putchar('\n');
     count++;
     
     return count;

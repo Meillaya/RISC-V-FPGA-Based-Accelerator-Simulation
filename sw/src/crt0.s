@@ -12,7 +12,7 @@ _start:
     # A value of 1 indicates success.
     la t0, tohost
     li t1, 1
-    sd t1, 0(t0)
+    sw t1, 0(t0)
 
     # Infinite loop to wait for simulation to terminate
 1:  j 1b
@@ -22,4 +22,10 @@ _start:
 .globl _stack_top
 _stack:
     .skip 4096 # 4KB stack
-_stack_top: 
+_stack_top:
+
+.section .htif
+.align 8
+.globl tohost
+tohost:
+    .skip 8 

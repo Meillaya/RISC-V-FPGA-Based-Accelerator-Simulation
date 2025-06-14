@@ -42,7 +42,9 @@ M_6 &= (A_{21} - A_{11})(B_{11} + B_{12}) \\
 M_7 &= (A_{12} - A_{22})(B_{21} + B_{22})
 \end{align}
 $$
+
 And then constructs the result:
+
 $$
 \begin{align}
 C_{11} &= M_1 + M_4 - M_5 + M_7 \\
@@ -749,5 +751,3 @@ As we look toward the future of computing, with the end of Moore's Law driving d
 This FPGA-based matrix multiplication accelerator, while conceptually simple, embodies the fundamental principles that will drive the evolution of computing: specialization, parallelism, and the intelligent exploitation of problem structure in hardware. It serves as both a practical implementation and a stepping stone toward more ambitious accelerator designs that will shape the future of high-performance computing.
 
 ---
-
-*This extensive theoretical foundation and comprehensive reference list provides the academic rigor necessary for understanding the deep principles underlying FPGA-based matrix multiplication acceleration, while the practical implementation details demonstrate how theory translates into working hardware. The combination of mathematical analysis, algorithmic insights, and engineering implementation creates a complete framework for understanding and advancing the field of hardware acceleration.* 
